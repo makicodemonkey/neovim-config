@@ -1,6 +1,7 @@
 # Minimal Neovim config
 
-This is my personal Neovim config, aiming for minimalism.
+This is my personal Neovim config, aiming for minimalism.  
+Neovim 0.12+ required.
 
 # Setup
 
