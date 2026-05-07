@@ -1,3 +1,13 @@
+vim.api.nvim_create_user_command("PackUpdate", function()
+    vim.pack.update()
+end, { desc = "Update all plugins" })
+
+
+vim.api.nvim_create_user_command("PackDelete", function(opts)
+    vim.pack.del(opts.fargs)
+end, { nargs = "+", desc = "Delete plugins (space separated)" })
+
+
 vim.pack.add({
     "https://github.com/folke/which-key.nvim",
     "https://github.com/nvim-mini/mini.nvim",
