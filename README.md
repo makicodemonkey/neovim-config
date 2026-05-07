@@ -21,5 +21,4 @@ git clone https://github.com/codemajom/neovim-config.git "${XDG_CONFIG_HOME:-$HO
 - nvim-mini/mini.nvim
     - mini.statusline
     - mini.pick
-    - mini.pairs
 - stevearc/oil.nvim

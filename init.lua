@@ -1,6 +1,5 @@
 require("vim._core.ui2").enable({})
-require("lazy-bootstrap")
 require("configs")
 require("keymaps")
 require("autocommands")
-require("lazy-plugins")
+require("vim-pack")
