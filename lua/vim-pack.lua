@@ -8,76 +8,50 @@ vim.api.nvim_create_user_command("PackDelete", function(opts)
 end, { nargs = "+", desc = "Delete plugins (space separated)" })
 
 
-vim.pack.add({
-    "https://github.com/folke/which-key.nvim",
-    "https://github.com/nvim-mini/mini.nvim",
-    "https://github.com/stevearc/oil.nvim",
-})
+vim.api.nvim_create_user_command("PackList", function()
+    local active = vim.iter(vim.pack.get())
+        :filter(function(x) return x.active end)
+        :map(function(x) return x.spec.name end)
+        :totable()
+
+    if #active == 0 then
+        vim.notify("No active plugins!", vim.log.levels.INFO)
+        return
+    end
+
+    print("Active plugins:\n")
+    for _, name in ipairs(active) do
+        print(name)
+    end
+
+end, { desc = "List active plugins" })
 
 
-require("which-key").setup({
-    delay = 0,
-    icons = {
-        mappings = vim.g.have_nerd_font,
-        keys = vim.g.have_nerd_font and {} or {
-            Up = "<Up> ",
-            Down = "<Down> ",
-            Left = "<Left> ",
-            Right = "<Right> ",
-            C = "<C-…> ",
-            M = "<M-…> ",
-            D = "<D-…> ",
-            S = "<S-…> ",
-            CR = "<CR> ",
-            Esc = "<Esc> ",
-            ScrollWheelDown = "<ScrollWheelDown> ",
-            ScrollWheelUp = "<ScrollWheelUp> ",
-            NL = "<NL> ",
-            BS = "<BS> ",
-            Space = "<Space> ",
-            Tab = "<Tab> ",
-            F1 = "<F1>",
-            F2 = "<F2>",
-            F3 = "<F3>",
-            F4 = "<F4>",
-            F5 = "<F5>",
-            F6 = "<F6>",
-            F7 = "<F7>",
-            F8 = "<F8>",
-            F9 = "<F9>",
-            F10 = "<F10>",
-            F11 = "<F11>",
-            F12 = "<F12>",
-        },
-    },
-    spec = {
-        { "<leader>s", group = "[S]earch", mode = { "n" } },
-    }
-})
+vim.api.nvim_create_user_command("PackCheck", function()
+    local inactive = vim.iter(vim.pack.get())
+        :filter(function(x) return not x.active end)
+        :map(function(x) return x.spec.name end)
+        :totable()
 
+    if #inactive == 0 then
+        vim.notify("All plugins active!", vim.log.levels.INFO)
+        return
+    end
 
-vim.cmd("colorscheme minicyan")
-local statusline = require("mini.statusline")
-statusline.setup({ use_icons = vim.g.have_nerd_font })
-statusline.section_location = function()
-    return "%2l:%-2v"
-end
+    print("Inactive plugins:\n")
+    for _, name in ipairs(inactive) do
+        print(name)
+    end
 
-local pick = require("mini.pick")
-pick.setup({ source = { show = pick.default_show } })
-vim.keymap.set("n", "<leader>sf", "<CMD>Pick files<CR>", { desc = "[S]earch [F]iles" })
-vim.keymap.set("n", "<leader>sg", "<CMD>Pick grep_live<CR>", { desc = "[S]earch [G]rep" })
-vim.keymap.set("n", "<leader>sh", "<CMD>Pick help<CR>", { desc = "[S]earch [H]elp" })
-vim.keymap.set("n", "<leader>sr", "<CMD>Pick resume<CR>", { desc = "[S]earch [R]esume" })
+    local choice = vim.fn.confirm("Delete all inactive plugins?", "&Yes\n&No", 2)
 
+    if choice == 1 then
+        vim.pack.del(inactive)
+        vim.notify("Deleted " .. #inactive .. " plugin(s).", vim.log.levels.INFO)
+        vim.api.nvim_exec_autocmds("User", { pattern = "PackChanged" })
+    else
+        vim.notify("Deletion cancelled.", vim.log.levels.INFO)
+    end
 
-require("oil").setup({
-    columns = {
-        -- "icon",
-        "permissions",
-        "size",
-        "mtime",
-    },
-    delete_to_trash = true,
-})
+end, { desc = "List inactive plugins, and choose to delete" })
 
